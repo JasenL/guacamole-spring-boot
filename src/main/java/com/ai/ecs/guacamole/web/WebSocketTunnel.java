@@ -52,8 +52,8 @@ public class WebSocketTunnel extends GuacamoleWebSocketTunnelEndpoint {
         String index = session.getPathParameters().get("index");
 
         String username = session.getUserPrincipal().getName();
-        String hostname = "10.242.4.9";
-        int port = 40013;
+        String hostname = "";
+        int port = ;
         HostService hostService = applicationContext.getBean(HostService.class);
 
         Host host = hostService.getHostById(index);
@@ -73,7 +73,7 @@ public class WebSocketTunnel extends GuacamoleWebSocketTunnelEndpoint {
              * create-drive-path = true
              */
             configuration.setParameter("enable-drive", "true");
-            configuration.setParameter("drive-path", "/ngboss/webapp/thirdparty/guaupload/" + username);
+            configuration.setParameter("drive-path", "");
             configuration.setParameter("create-drive-path", "true");
         }
         configuration.setParameter("hostname", host.getHostname());
