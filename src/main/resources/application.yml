@@ -15,14 +15,14 @@ spring:
       driver-class-name: oracle.jdbc.OracleDriver
       type: com.alibaba.druid.pool.DruidDataSource
       druid:
-        url: jdbc:oracle:thin:@10.238.99.12:1521:echtest
-        username: uop_uec
-        password: ko0FLlccqU6gjJVLVqLqdiErTJ6jFC4GqcPEXFnn7wovRB+WKgAO5owZwrkiXee+l+aWFrzOW6ii0Z0WEYvOwg==
+        url: 
+        username: 
+        password: 
         filters: config
         connect-properties:
           #数据库密码加密，加密方法为test下测试类 加密类型为RSA
           config.decrypt: true
-          config.decrypt.key: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALnC1q82BWag69D5rm08zmXYuhquptvMgYOSOt8/c+Ng/IQeJNyHnr3084n2NMBJOBbm8+rY2NnFYiS1C6pi2vcCAwEAAQ==
+          config.decrypt.key: 
   mvc:
     view:
       #模板内容
