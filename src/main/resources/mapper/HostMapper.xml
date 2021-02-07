@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ai.ecs.guacamole.mapper.HostMapper">
+
+    <select id="getHostList" resultType="com.ai.ecs.guacamole.model.Host">
+    select t.id,t.PROTOCOL,t.hostname from tf_ed_gac_host t
+    </select>
+    <select id="getHostById" resultType="com.ai.ecs.guacamole.model.Host">
+        select t.* from tf_ed_gac_host t where t.id = #{id}
+    </select>
+</mapper>

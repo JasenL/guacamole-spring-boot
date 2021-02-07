@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>登录</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" th:href="@{static/css/layui.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{static/css/style.css}" type="text/css"/>
+    <script th:src="@{static/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{static/js/layui.js}" type="text/javascript"></script>
+</head>
+<body>
+<div class="login-main">
+    <header class="layui-elip">登录</header>
+
+    <form class="layui-form">
+
+        <div class="layui-input-inline">
+            <input autocomplete="off" class="layui-input" id="mobile" lay-verify="required|phone" name="mobile"
+                   placeholder="手机号" required=""
+                   type="text"/>
+        </div>
+        <div class="layui-input-inline">
+            <input autocomplete="off" class="layui-input" id="smsCode" lay-verify="required" name="smsCode"
+                   placeholder="验证码" required=""
+                   style="width: 60%;display: inline;" type="text"/>
+            <button class="layui-btn layui-btn-normal" id="sendSms" style="width: 36%;margin-left: 2%" type="button">
+                发送验证码
+            </button>
+        </div>
+
+        <div class="layui-input-inline login-btn">
+            <button class="layui-btn" id="login_in" lay-filter="login" lay-submit="" type="button">登录</button>
+        </div>
+        <hr/>
+    </form>
+</div>
+
+<script th:src="@{static/my_js/smslogin.js}"></script>
+<script type="text/javascript">
+    var remainTime = 60;
+
+    // 为【获取短信随机码】按钮重新设置样式和绑定点击事件
+    function resetSmsBtn() {
+        $("#sendSms").attr('disabled', false);
+        $("#sendSms").removeClass('layui-btn-disabled');
+        $("#sendSms").text('发送验证码');
+        // 重置倒计时为60秒
+        remainTime = 60;
+    }
+
+    //设置倒计时
+    function startCountDown() {
+        // 剩余时间大于零则继续倒计时
+        if (remainTime > 0) {
+            intervalId = setInterval("GetRemaminTime();", 1000);
+        } else {
+            try {
+                if (typeof (intervalId) != undefined) {
+                    // 停止计时
+                    window.clearInterval(intervalId);
+                }
+            } catch (err) {
+
+            }
+            // 为获取短信随机码按钮重新设置样式和绑定点击事件
+            resetSmsBtn();
+        }
+    }
+
+    //将剩余时间在页面显示并将剩余时间 减去1秒
+    function GetRemaminTime() {
+        // 将剩余时间减去一秒
+        remainTime = remainTime - 1;
+        // 将剩余时间显示到页面上
+        $("#sendSms").text(remainTime + "秒后重新获取");
+        if (remainTime < 0 || remainTime == 0) {
+            try {
+                if (typeof (intervalId) != undefined) {
+                    // 停止计时
+                    window.clearInterval(intervalId);
+                }
+            } catch (err) {
+            }
+            // 为获取短信随机码按钮重新设置样式和绑定点击事件
+            resetSmsBtn();
+        }
+    }
+
+</script>
+</body>
+</html>

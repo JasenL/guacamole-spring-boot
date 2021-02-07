@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <title>主页</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+    <link rel="stylesheet" th:href="@{static/css/layui.css}"/>
+    <script th:src="@{static/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{static/js/layui.js}"></script>
+    <script th:src="@{static/js/all.js}"></script>
+    <script th:src="@{static/js/FileSaver.js}"></script>
+    <script th:src="@{static/js/clipboard.js}"></script>
+    <script th:src="@{static/js/ResizeSensor.js}"></script>
+    <script th:src="@{static/js/ElementQueries.js}"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><input type="file" id="file-input"/></li>
+            <li class="layui-nav-item">
+                <span class="layui-badge layui-bg-orange" id="help">?</span>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item"><a id="logout">退了</a></li>
+        </ul>
+    </div>
+    <div class="layui-body" id="1">
+        <div id="display" style="width: 100%;height: 100%;overflow: hidden"></div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    var h = getUrlParam("h");
+    var t = getUrlParam("t");
+
+    // Get display div from document
+    var display = document.getElementById("display");
+    var wi = window.innerWidth * 0.94;
+    var hi = window.innerHeight * 0.91;
+    var url = "webSocket/" + h + "/" + wi + "/" + hi + "/" + wi + "*" + hi;
+    // Instantiate client, using an HTTP tunnel for communications.
+    var guac = new Guacamole.Client(
+        // new Guacamole.HTTPTunnel("tunnel")
+        new Guacamole.WebSocketTunnel(url)
+    );
+
+    display.appendChild(guac.getDisplay().getElement());
+    guac.onclipboard = clipboard.onClipboard;
+    if (t == "rdp") {
+        clipboard.install(guac);
+        new ResizeSensor(display, function () {
+            const elm = display;
+            let display1 = guac.getDisplay();
+            if (!elm || !elm.offsetWidth) {
+                return
+            }
+            let pixelDensity = window.devicePixelRatio || 1
+            const width = wi * pixelDensity
+            const height = hi * pixelDensity
+            if (display1.getWidth() !== width || display1.getHeight() !== height) {
+                guac.sendSize(width, height)
+            }
+            // // setting timeout so display has time to get the correct size
+            setTimeout(() => {
+                if (elm.offsetHeight == 0) {
+                    elm.offsetWidth = 1;
+                }
+                const scale = Math.min(
+                    window.innerWidth * 0.99 / Math.max(display1.getWidth(), 1),
+                    window.innerHeight * 0.99 / Math.max(display1.getHeight(), 1)
+                )
+                console.log(scale);
+                display1.scale(scale)
+            }, 100)
+        });
+    } else {
+        $("#file-input").hide();
+        window.addEventListener('focus', e => {
+            if (e.target === window) {
+                clipboard.update(guac)()
+            }
+        }, true)
+    }
+    guac.onerror = function (error) {
+        alert(error);
+    };
+
+
+    // Connect
+    guac.connect();
+
+    // Disconnect on close
+    window.onunload = function () {
+        guac.disconnect();
+    }
+
+    // Mouse
+    var mouse = new Guacamole.Mouse(guac.getDisplay().getElement());
+
+    mouse.onmousedown =
+        mouse.onmouseup =
+            mouse.onmousemove = function (mouseState) {
+                const scaledMouseState = Object.assign({}, mouseState, {
+                    x: mouseState.x / guac.getDisplay().getScale(),
+                    y: mouseState.y / guac.getDisplay().getScale(),
+                })
+                guac.sendMouseState(scaledMouseState);
+            };
+
+    // Keyboard
+    var keyboard = new Guacamole.Keyboard(document);
+
+    keyboard.onkeydown = function (keysym) {
+        guac.sendKeyEvent(1, keysym);
+    };
+
+    keyboard.onkeyup = function (keysym) {
+        guac.sendKeyEvent(0, keysym);
+    };
+</script>
+<script th:src="@{static/js/download.js}"></script>
+<script th:src="@{static/js/upload.js}"></script>
+<script th:src="@{static/my_js/logout.js}"></script>
+<script type="text/javascript">
+    $("#help").click(function () {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.alert("在上传文件处选择文件后，文件自动上传至我的电脑中guamole虚拟磁盘中。" +
+                "下载时仅需将文件放进虚拟磁盘中Download文件夹下即可。");
+        });
+    });
+</script>
+</body>
+</html>
